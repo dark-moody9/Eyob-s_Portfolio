@@ -441,18 +441,37 @@ section.active {
     border-radius: 50%;
     margin-left: -2rem;
   }
-  .resume-detail.skills .resume-list{
+  /*.resume-detail.skills .resume-list{
     grid-template-columns: repeat(auto-fit, minmax(15rem 1fr));
     height: auto;
     overflow: visible;
-  }
+  }*/
+  .resume-detail.skills .resume-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+    .resume-detail.skills .resume-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+    .resume-detail.skills .resume-list {
+        grid-template-columns: 1fr;
+    }
+}
   .resume-detail.skills .resume-item{
     position: relative;
     align-items: center;
     height: auto;
   }
   .resume-detail.skills .resume-item i {
-    font-size: 7.5rem;
+    font-size: 5rem;
     transition: .5s;
   }
   .resume-detail.skills .resume-item:hover{
