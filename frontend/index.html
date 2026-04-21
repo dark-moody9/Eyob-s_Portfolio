@@ -396,24 +396,19 @@
                     </div>
                 </div>
             </div>
-    <div class="contact-box">
-    <!-- Added action, method, and hidden access_key -->
-        <form action="https://api.web3forms.com/submit" method="POST">
-        <!-- Add this hidden input with your free Web3Forms access key -->
-             <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE">
-
-                <h2 class="heading">Contact <span>Me!</span></h2>
-            <div class="field-box">
-            <!-- Added name attributes so the backend receives the data -->
-                 <input type="text" name="fullName" placeholder="Full Name" required>
-                 <input type="email" name="email" placeholder="Email Address" required>
-                 <input type="text" name="phone" placeholder="Phone Number" required>
-                 <input type="text" name="subject" placeholder="Email Subject" required>
-                 <textarea name="message" placeholder="Your Message" required></textarea>
+            <div class="contact-box">
+                <form action="">
+                    <h2 class="heading">Contact <span>Me!</span></h2>
+                    <div class="field-box">
+                        <input type="text" placeholder="Full Name" required>
+                        <input type="email" placeholder="Email Address" required>
+                        <input type="text" placeholder="Phone Number" required>
+                        <input type="text" placeholder="Email Subject" required>
+                        <textarea name="" id="" placeholder="Your Message"></textarea>
+                    </div>
+                    <button type="submit" class="btn">Send Message</button>
+                </form>
             </div>
-        <button type="submit" class="btn">Send Message</button>
-        </form>
-    </div>
         </div>
     </section>
 
