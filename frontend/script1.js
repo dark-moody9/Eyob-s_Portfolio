@@ -1,4 +1,4 @@
-// ===================== EXISTING CODE (unchanged except contact form handler) =====================
+// ===================== EXISTING CODE (preserved) =====================
 
 const navlinks = document.querySelectorAll('header nav a');
 const logolink = document.querySelector('.logo');
@@ -28,12 +28,10 @@ navlinks.forEach((link, idx) => {
         });
         sections[idx].classList.add('active');
         
-        // Close mobile menu if open
         if (window.innerWidth <= 768) {
             nav.classList.remove('active');
         }
         
-        // Scroll to top for mobile
         if (window.innerWidth <= 768) {
             window.scrollTo(0, 0);
         }
@@ -48,7 +46,6 @@ logolink.addEventListener('click', (e) => {
     });
     sections[0].classList.add('active');
     
-    // Close mobile menu if open
     if (window.innerWidth <= 768) {
         nav.classList.remove('active');
     }
@@ -100,12 +97,10 @@ arrowLeft.addEventListener('click', () => {
     activePortfolio();
 });
 
-// Mobile Menu Functionality
 menuIcon.addEventListener('click', () => {
     nav.classList.toggle('active');
 });
 
-// Close mobile menu when clicking outside
 document.addEventListener('click', (e) => {
     if (window.innerWidth <= 768 && 
         !e.target.closest('nav') && 
@@ -115,7 +110,6 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// Handle window resize
 window.addEventListener('resize', () => {
     if (window.innerWidth > 768) {
         nav.classList.remove('active');
@@ -123,10 +117,8 @@ window.addEventListener('resize', () => {
     activePortfolio();
 });
 
-// Initialize portfolio carousel
 activePortfolio();
 
-// Add smooth scrolling for anchor links
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         if (this.getAttribute('href') === '#') {
@@ -135,7 +127,6 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     });
 });
 
-// Update portfolio gap on resize
 const updatePortfolioGap = () => {
     if (window.innerWidth <= 768) {
         imgSlide.style.gap = '0';
@@ -148,30 +139,39 @@ const updatePortfolioGap = () => {
 window.addEventListener('resize', updatePortfolioGap);
 updatePortfolioGap();
 
-// ===================== NEW: EMAILJS CONTACT FORM HANDLER =====================
-// IMPORTANT: You must include the EmailJS library in your HTML:
-// <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-
-// REPLACE THESE WITH YOUR ACTUAL EMAILJS CREDENTIALS (get them free from emailjs.com)
-const EMAILJS_CONFIG = {
-    publicKey: 'YOUR_PUBLIC_KEY',      // e.g., 'user_abc123xyz'
-    serviceID: 'YOUR_SERVICE_ID',      // e.g., 'service_abc123'
-    templateID: 'YOUR_TEMPLATE_ID'     // e.g., 'template_xyz789'
-};
-
-// Initialize EmailJS once (the library must be loaded first)
-if (typeof emailjs !== 'undefined') {
-    emailjs.init(EMAILJS_CONFIG.publicKey);
-} else {
-    console.error('EmailJS library not loaded. Add the script tag to your HTML.');
-}
+// ===================== BACKEND CONTACT FORM HANDLER =====================
+// Replace with your actual backend endpoint (from Option 2 or your own server)
+// Example: 'https://your-backend.onrender.com/api/contact' or 'http://localhost:3000/api/contact'
+const BACKEND_API_URL = '/api/contact';  // Change this to your real endpoint
 
 const contactForm = document.querySelector('.contact-box form');
 if (contactForm) {
     contactForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        // Get the submit button to show loading state
+        // Get form fields – adjust selectors to match your actual input names/ids
+        const fullNameInput = contactForm.querySelector('input[name="fullName"]');
+        const phoneInput = contactForm.querySelector('input[name="phone"]');
+        const subjectInput = contactForm.querySelector('input[name="subject"]');
+        const messageInput = contactForm.querySelector('textarea[name="message"]');
+        
+        // Also try alternative common names/ids if needed
+        const fullName = fullNameInput?.value || 
+                         contactForm.querySelector('#name')?.value || 
+                         contactForm.querySelector('input[name="name"]')?.value || '';
+                         
+        const phone = phoneInput?.value || '';
+        const subject = subjectInput?.value || '';
+        const message = messageInput?.value || 
+                        contactForm.querySelector('#message')?.value || '';
+
+        // Basic validation
+        if (!fullName.trim() || !message.trim()) {
+            alert('❌ Please enter your name and message.');
+            return;
+        }
+
+        // Get submit button for loading state
         const submitBtn = contactForm.querySelector('button[type="submit"]');
         const originalBtnHTML = submitBtn.innerHTML;
         
@@ -180,37 +180,28 @@ if (contactForm) {
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
 
         try {
-            // Collect form data (adjust selectors to match your form input names/ids)
-            const fullName = contactForm.querySelector('input[name="fullName"]')?.value || '';
-            const phone = contactForm.querySelector('input[name="phone"]')?.value || '';
-            const subject = contactForm.querySelector('input[name="subject"]')?.value || '';
-            const message = contactForm.querySelector('textarea[name="message"]')?.value || '';
-
-            // Basic validation
-            if (!fullName.trim() || !message.trim()) {
-                throw new Error('Please enter your name and message.');
-            }
-
-            // Send email via EmailJS
-            const response = await emailjs.send(
-                EMAILJS_CONFIG.serviceID,
-                EMAILJS_CONFIG.templateID,
-                {
-                    fullName: fullName,
+            const response = await fetch(BACKEND_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: fullName,
+                    email: contactForm.querySelector('input[type="email"]')?.value || '',
                     phone: phone,
                     subject: subject,
                     message: message
-                }
-            );
+                })
+            });
 
-            if (response.status === 200) {
+            const result = await response.json();
+
+            if (response.ok) {
                 alert('✅ Message sent successfully! I will get back to you soon.');
-                contactForm.reset(); // Clear all form fields
+                contactForm.reset(); // Clear all fields
             } else {
-                throw new Error('Unexpected response status: ' + response.status);
+                throw new Error(result.error || 'Server responded with an error');
             }
         } catch (error) {
-            console.error('EmailJS error:', error);
+            console.error('Backend error:', error);
             alert('❌ Failed to send message. Please try again later.\n' + (error.message || ''));
         } finally {
             // Restore button
